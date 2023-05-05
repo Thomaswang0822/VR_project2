@@ -11,6 +11,7 @@ public class AirRacing : MonoBehaviour
     public List<Vector3> checkPts;
     // should have been private, but we make it public to better switch viewpoint in pause mode
     public List<GameObject> checkPt_Objs;
+    public LineRenderer lineRenderer;
     // Private:
     private float sphR_foot = 30.0f;
     private float sphR;
@@ -25,6 +26,7 @@ public class AirRacing : MonoBehaviour
     private readonly Color unfinishedColor = new Color(1.0f, 0.0f, 0.0f, 0.5f);  // half-transparent red
     private readonly Color targetColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // solid blue
     private readonly Color finishedColor = new Color(0.0f, 0.0f, 1.0f, 0.1f);  // very transparent blue
+    private const float dotSpacing = 0.5f;
 
     
     // Start is called before the first frame update
@@ -36,6 +38,11 @@ public class AirRacing : MonoBehaviour
         prevSph = checkPt_Objs[0];
         nextSph = checkPt_Objs[1];
         nextIdx = 1;
+
+        camera.transform.position = prevSph.transform.position;
+
+        //
+        lineRenderer.material.color = Color.blue;
 
         
     }
@@ -76,16 +83,14 @@ public class AirRacing : MonoBehaviour
         sphR = sphR_foot * foot2meter;
         spherePrefab.transform.localScale = Vector3.one * sphR; 
 
-        // Also draw a dummy sphere at start location
-        GameObject dummy = Instantiate(spherePrefab, camera.transform.position, Quaternion.identity);
-        dummy.GetComponent<Renderer>().material.color = finishedColor;
-        checkPt_Objs.Add(dummy);
-
         foreach (Vector3 pos in checkPts)
         {
             GameObject sphere = Instantiate(spherePrefab, pos, Quaternion.identity);
             checkPt_Objs.Add(sphere);
         }
+
+        checkPt_Objs[0].GetComponent<Renderer>().material.color = finishedColor;
+        checkPt_Objs[1].GetComponent<Renderer>().material.color = targetColor;
 
         Destroy(spherePrefab); // destroy the sphere prefab since it's no longer needed
     }
@@ -108,6 +113,32 @@ public class AirRacing : MonoBehaviour
             // update color
             prevSph.GetComponent<Renderer>().material.color = finishedColor;
             nextSph.GetComponent<Renderer>().material.color = targetColor;
+        }
+    }
+
+    /// <summary>
+    /// Draw a line indicator between 
+    /// 1. currPos and target
+    /// ? AND/OR
+    /// 2. prev and target
+    /// </summary>
+    void draw_line_ind() {
+        Vector3 startPos = prevSph.transform.position;
+        Vector3 endPos = nextSph.transform.position;
+        // Calculate the number of dots we need to draw
+        Vector3 direction = endPos - startPos;
+        float distance = direction.magnitude;
+        int numDots = Mathf.FloorToInt(distance / dotSpacing);
+
+        // Set the number of segments in the line renderer
+        lineRenderer.positionCount = numDots * 2 + 2;
+
+        // Set the positions of the vertices to create the dotted line
+        for (int i = 0; i <= numDots; i++)
+        {
+            Vector3 dotPosition = Vector3.Lerp(startPos, endPos, (float)i / numDots);
+            lineRenderer.SetPosition(i * 2, dotPosition);
+            lineRenderer.SetPosition(i * 2 + 1, dotPosition);
         }
     }
 }
