@@ -28,7 +28,6 @@
 # Oculus integration
 /[Aa]ssets/Oculus/
 /[Aa]ssets/WorldMaterialsFree/
-/[Aa]ssets/Utility/
 # Visual Studio cache directory
 .vs/
 

@@ -26,7 +26,9 @@ public class AirRacing : MonoBehaviour
     private readonly Color unfinishedColor = new Color(1.0f, 0.0f, 0.0f, 0.5f);  // half-transparent red
     private readonly Color targetColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // solid blue
     private readonly Color finishedColor = new Color(0.0f, 0.0f, 1.0f, 0.1f);  // very transparent blue
-    private const float dotSpacing = 0.5f;
+    // private const float segLen = 0.5f;  // length of a segment in a dotted line
+    // private const float segSpacing = 0.3f;  // spacing between segments
+    private const int nSeg = 2;  // number of segments per dotted line
 
     
     // Start is called before the first frame update
@@ -42,7 +44,7 @@ public class AirRacing : MonoBehaviour
         camera.transform.position = prevSph.transform.position;
 
         //
-        lineRenderer.material.color = Color.blue;
+        lineRenderer.material.color = Color.green;
 
         
     }
@@ -50,7 +52,7 @@ public class AirRacing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        draw_line_ind();
     }
 
     // ********** Helper Functions **********
@@ -123,22 +125,30 @@ public class AirRacing : MonoBehaviour
     /// 2. prev and target
     /// </summary>
     void draw_line_ind() {
-        Vector3 startPos = prevSph.transform.position;
+        /* Vector3 startPos = prevSph.transform.position;
         Vector3 endPos = nextSph.transform.position;
-        // Calculate the number of dots we need to draw
-        Vector3 direction = endPos - startPos;
-        float distance = direction.magnitude;
-        int numDots = Mathf.FloorToInt(distance / dotSpacing);
+        Vector3 direction = (endPos - startPos).normalized;
+        float distance = (endPos - startPos).magnitude; 
+
+        // length of a segment plus spacing between segments
+        float unitLen = distance / nSeg;
+        float segLen = 0.6f * unitLen;
 
         // Set the number of segments in the line renderer
-        lineRenderer.positionCount = numDots * 2 + 2;
+        // add an extra segment (thus 2 pos) to make sure 
+        // the line reaches the end
+        lineRenderer.positionCount = nSeg * 2 + 2;
 
         // Set the positions of the vertices to create the dotted line
-        for (int i = 0; i <= numDots; i++)
+        for (int i = 0; i <= nSeg; i++)
         {
-            Vector3 dotPosition = Vector3.Lerp(startPos, endPos, (float)i / numDots);
-            lineRenderer.SetPosition(i * 2, dotPosition);
-            lineRenderer.SetPosition(i * 2 + 1, dotPosition);
-        }
+            Vector3 segStartPos = startPos + (direction * i * unitLen);
+            Vector3 segEndPos = segStartPos + (direction * segLen);
+            lineRenderer.SetPosition(i * 2, segStartPos);
+            lineRenderer.SetPosition(i * 2 + 1, segEndPos);
+        } */
+
+        lineRenderer.SetPosition(0, prevSph.transform.position);
+        lineRenderer.SetPosition(1, nextSph.transform.position);
     }
 }
