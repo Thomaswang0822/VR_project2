@@ -24,11 +24,6 @@ public class PlaneController : MonoBehaviour
     {
         ar = airRacingContainer.GetComponent<AirRacing>();
         rb = GetComponent<Rigidbody>();
-
-        // rb.detectCollisions = false;
-
-        // For now, make the plane invisible.
-        // GetChild(0).GetComponent<MeshRenderer>().enabled = false;
     }
 
     // Update is called once per frame

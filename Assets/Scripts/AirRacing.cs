@@ -228,6 +228,7 @@ public class AirRacing : MonoBehaviour
         
         // TODO: Check collider intersection instead?
         if (Vector3.Distance(currPos, nextSph.transform.position) <= sphR)
+        // if (plane.GetComponent<Collider>().bounds.Intersects(nextSph.GetComponent<Collider>().bounds))
         {
             if (nextIdx == checkPts.Count - 1) {
                 // If nextIdx the last checkpoint, set game state and return
