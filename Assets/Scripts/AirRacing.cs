@@ -12,13 +12,15 @@ public class AirRacing : MonoBehaviour
     // should have been private, but we make it public to better switch viewpoint in pause mode
     public List<GameObject> checkPt_Objs;
     public LineRenderer lineRenderer;
+    public GameObject miniMap;
     // Private:
     private float sphR_foot = 30.0f;
     private float sphR;
     // previous and next checkPt sphere indicators: draw line and respawn
     private GameObject prevSph;
     private GameObject nextSph;
-    private int nextIdx;
+    private int nextIdx;  // so to increment it and update nextSph
+    private float r_miniMap;  // radius of minimap
     // Consts:
     private const float inch2meter = 0.0254f;  // inch to meter
     private const float foot2meter = 0.3048f;
@@ -29,6 +31,7 @@ public class AirRacing : MonoBehaviour
     // private const float segLen = 0.5f;  // length of a segment in a dotted line
     // private const float segSpacing = 0.3f;  // spacing between segments
     private const int nSeg = 2;  // number of segments per dotted line
+    private const float dist_miniMap = 5.0f;  // distance from camera (in camera coord Z axis)
 
     
     // Start is called before the first frame update
@@ -40,11 +43,12 @@ public class AirRacing : MonoBehaviour
         prevSph = checkPt_Objs[0];
         nextSph = checkPt_Objs[1];
         nextIdx = 1;
-
+        // move camera to first checkingPt
         camera.transform.position = prevSph.transform.position;
-
         //
         lineRenderer.material.color = Color.green;
+
+        r_miniMap = miniMap.transform.localScale.x;
 
         
     }
@@ -53,6 +57,7 @@ public class AirRacing : MonoBehaviour
     void Update()
     {
         draw_line_ind();
+        draw_miniMap();
     }
 
     // ********** Helper Functions **********
@@ -125,30 +130,15 @@ public class AirRacing : MonoBehaviour
     /// 2. prev and target
     /// </summary>
     void draw_line_ind() {
-        /* Vector3 startPos = prevSph.transform.position;
-        Vector3 endPos = nextSph.transform.position;
-        Vector3 direction = (endPos - startPos).normalized;
-        float distance = (endPos - startPos).magnitude; 
-
-        // length of a segment plus spacing between segments
-        float unitLen = distance / nSeg;
-        float segLen = 0.6f * unitLen;
-
-        // Set the number of segments in the line renderer
-        // add an extra segment (thus 2 pos) to make sure 
-        // the line reaches the end
-        lineRenderer.positionCount = nSeg * 2 + 2;
-
-        // Set the positions of the vertices to create the dotted line
-        for (int i = 0; i <= nSeg; i++)
-        {
-            Vector3 segStartPos = startPos + (direction * i * unitLen);
-            Vector3 segEndPos = segStartPos + (direction * segLen);
-            lineRenderer.SetPosition(i * 2, segStartPos);
-            lineRenderer.SetPosition(i * 2 + 1, segEndPos);
-        } */
-
         lineRenderer.SetPosition(0, prevSph.transform.position);
         lineRenderer.SetPosition(1, nextSph.transform.position);
+    }
+
+
+    void draw_miniMap() {
+        // bottom mid point in world coordinate
+        Vector3 worldBL = camera.ScreenToWorldPoint(new Vector3(0.5f * camera.pixelWidth, 0f, dist_miniMap));
+        // move up a little bit
+        miniMap.transform.position = worldBL + new Vector3(0f, 0.5f * r_miniMap, 0f);
     }
 }
