@@ -25,10 +25,10 @@ public class PlaneController : MonoBehaviour
         ar = airRacingContainer.GetComponent<AirRacing>();
         rb = GetComponent<Rigidbody>();
 
-        rb.detectCollisions = false;
+        // rb.detectCollisions = false;
 
         // For now, make the plane invisible.
-        GetComponent<MeshRenderer>().enabled = false;
+        // GetChild(0).GetComponent<MeshRenderer>().enabled = false;
     }
 
     // Update is called once per frame
@@ -37,14 +37,28 @@ public class PlaneController : MonoBehaviour
         HandleDebugInput();
     }
 
+    void OnCollisionEnter(Collision collision)
+    {
+        // Signal a collision to the air racing controller
+        ar.OnCollision();
+    }
+
     void HandleDebugInput() {
         throttle = 0.0f;
         roll = 0.0f;
         pitch = 0.0f;
         yaw = 0.0f;
 
+        if (!ar.AcceptInput()) return;
+
         if (Input.GetKey("w")) {
             throttle = 1.0f;
+        }
+
+        if (Input.GetKey("e")) {
+            roll = 1.0f;
+        } else if (Input.GetKey("q")) {
+            roll = -1.0f;
         }
 
         if (Input.GetKey("up")) {

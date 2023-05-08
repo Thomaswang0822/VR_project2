@@ -2,6 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;  // to parse
 using UnityEngine;
+using TMPro;
+
+// There are three states that the game can be in:
+enum GameState {
+    // The game hasn't started and we're waiting for countdown. No input should be accepted.
+    Waiting,
+    // The game has started. The time elapsed ticks up.
+    Playing,
+    // The player collided with the ground/building. Time ticks up while countdown is shown. No input should be accepted.
+    Respawning,
+    // The player has crossed the last checkpoint. The final time is displayed. No input should be accepted.
+    Finished,
+}
 
 public class AirRacing : MonoBehaviour
 {
@@ -19,9 +32,11 @@ public class AirRacing : MonoBehaviour
     public Color targetColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // solid blue
     public Color finishedColor = new Color(0.0f, 1.0f, 0.0f, 0.1f);  // green
 
+    public TextMeshProUGUI hud;
     public GameObject miniMap;
 
     // Private:
+    private GameState state = GameState.Waiting;
     private PlaneController planeController;
     private float sphR_foot = 100.0f;
     private float sphR;
@@ -30,6 +45,11 @@ public class AirRacing : MonoBehaviour
     private GameObject nextSph;
     private int nextIdx;  // so to increment it and update nextSph
     private float r_miniMap;  // radius of minimap
+
+    // Timer stuff
+    private float elapsed = 0f;
+    private float countdown = 3.0f;
+
     // Consts:
     private const float inch2meter = 0.0254f;  // inch to meter
     private const float foot2meter = 0.3048f;
@@ -52,7 +72,7 @@ public class AirRacing : MonoBehaviour
 
         // move plane to first checkpoint
         planeController = plane.GetComponent<PlaneController>();
-        plane.transform.position = prevSph.transform.position;
+        OrientPlane();
 
         lineRenderer.material.color = Color.green;
 
@@ -64,6 +84,9 @@ public class AirRacing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateTimers();
+        UpdateGUI();
+
         DrawLineInd();
         UpdateTarget();
         DrawMiniMap();
@@ -90,12 +113,95 @@ public class AirRacing : MonoBehaviour
         return positions;
     }
 
+    public bool AcceptInput() {
+        return state == GameState.Playing;
+    }
+
+    public void OnCollision() {
+        OrientPlane();
+        state = GameState.Respawning;
+    }
+
+    // Place plane at current idx. Point it towards next idx.
+    void OrientPlane() {
+        plane.transform.position = prevSph.transform.position;
+        plane.transform.forward = nextSph.transform.position - prevSph.transform.position;
+    }
+
+    // Update timers.
+    // We start in the Waiting state at the start of the game.
+    // Once enough time has passed (3.0s), switch the state so that the player can start playing.
+    // If we detect a collision with the ground or buildings, while playing, change the game state;
+    // set to respawning and respawn the player somewhere else. Tick the elapsed timer down.
+    // If the last checkpoint is cleared, we're finished!
+    void UpdateTimers() {
+        switch (state) {
+            case GameState.Waiting:
+                countdown -= Time.deltaTime;
+
+                if (countdown <= 0.0f) {
+                    countdown = 3.0f;
+                    state = GameState.Playing;
+                }
+
+                break;
+
+            case GameState.Playing:
+                elapsed += Time.deltaTime;
+
+                break;
+
+            case GameState.Respawning:
+                elapsed += Time.deltaTime;
+                countdown -= Time.deltaTime;
+
+                if (countdown <= 0.0f) {
+                    countdown = 3.0f;
+                    state = GameState.Playing;
+                }
+
+                break;
+
+            case GameState.Finished:
+                // Don't do anything
+                break;
+        }
+    }
+
+    // Update GUI
+    void UpdateGUI() {
+        switch (state) {
+            case GameState.Waiting:
+                hud.text = "Ready! " + countdown.ToString("F1") + "s";
+                break;
+
+            case GameState.Playing:
+                hud.text = "Cleared " + (nextIdx - 1).ToString() + "/" + (checkPts.Count - 1).ToString() + "\n";
+                hud.text += (Mathf.FloorToInt(elapsed / 60.0f)).ToString("D2") + ":" + System.String.Format("{0:00.0}", elapsed % 60.0f);
+
+                break;
+
+            case GameState.Respawning:
+                hud.text = "Crashed! Respawning in " + countdown.ToString("F1") + "s\n";
+                hud.text += "Cleared " + (nextIdx - 1).ToString() + "/" + (checkPts.Count - 1).ToString() + "\n";
+                hud.text += (Mathf.FloorToInt(elapsed / 60.0f)).ToString("D2") + ":" + System.String.Format("{0:00.0}", elapsed % 60.0f);
+
+                break;
+
+            case GameState.Finished:
+                hud.text = "Finished! ";
+                hud.text += (Mathf.FloorToInt(elapsed / 60.0f)).ToString("D2") + ":" + System.String.Format("{0:00.0}", elapsed % 60.0f);
+                break;
+        }
+    }
 
     void DrawCheckpoint() {
         GameObject spherePrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // set the color and transparency: half-transparent red
         spherePrefab.GetComponent<Renderer>().material.color = unfinishedColor;
         spherePrefab.GetComponent<Renderer>().material.shader = Shader.Find("Transparent/Diffuse");;
+        spherePrefab.GetComponent<SphereCollider>().enabled = false;
+
         // set the radius to 30.0 feet in meter
         sphR = sphR_foot * foot2meter;
         spherePrefab.transform.localScale = Vector3.one * sphR; 
@@ -123,6 +229,12 @@ public class AirRacing : MonoBehaviour
         // TODO: Check collider intersection instead?
         if (Vector3.Distance(currPos, nextSph.transform.position) <= sphR)
         {
+            if (nextIdx == checkPts.Count - 1) {
+                // If nextIdx the last checkpoint, set game state and return
+                state = GameState.Finished;
+                return;
+            }
+
             // update reference
             nextIdx++;
             prevSph = nextSph;
@@ -144,7 +256,6 @@ public class AirRacing : MonoBehaviour
         lineRenderer.SetPosition(0, prevSph.transform.position);
         lineRenderer.SetPosition(1, nextSph.transform.position);
     }
-
 
     void DrawMiniMap() {
         // bottom mid point in world coordinate
