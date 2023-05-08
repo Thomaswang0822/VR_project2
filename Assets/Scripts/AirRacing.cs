@@ -6,15 +6,20 @@ using UnityEngine;
 public class AirRacing : MonoBehaviour
 {
     // Public:
-    public Camera camera;
+    public GameObject plane;
     public GameObject campus;
     public List<Vector3> checkPts;
     // should have been private, but we make it public to better switch viewpoint in pause mode
     public List<GameObject> checkPtObjs;
     public LineRenderer lineRenderer;
 
+    public Color unfinishedColor = new Color(1.0f, 0.0f, 0.0f, 0.5f);  // half-transparent red
+    public Color targetColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // solid blue
+    public Color finishedColor = new Color(0.0f, 1.0f, 0.0f, 0.1f);  // green
+
     // Private:
-    private float sphR_foot = 30.0f;
+    private PlaneController planeController;
+    private float sphR_foot = 100.0f;
     private float sphR;
     // previous and next checkPt sphere indicators: draw line and respawn
     private GameObject prevSph;
@@ -25,9 +30,6 @@ public class AirRacing : MonoBehaviour
     private const float inch2meter = 0.0254f;  // inch to meter
     private const float foot2meter = 0.3048f;
     private const string checkPt_fPath = "Assets/Scripts/Sample-track.txt";
-    private readonly Color unfinishedColor = new Color(1.0f, 0.0f, 0.0f, 0.5f);  // half-transparent red
-    private readonly Color targetColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // solid blue
-    private readonly Color finishedColor = new Color(0.0f, 0.0f, 1.0f, 0.1f);  // very transparent blue
     // private const float segLen = 0.5f;  // length of a segment in a dotted line
     // private const float segSpacing = 0.3f;  // spacing between segments
     private const int nSeg = 2;  // number of segments per dotted line
@@ -43,7 +45,8 @@ public class AirRacing : MonoBehaviour
         nextSph = checkPtObjs[1];
         nextIdx = 1;
 
-        camera.transform.position = prevSph.transform.position;
+        planeController = plane.GetComponent<PlaneController>();
+        plane.transform.position = prevSph.transform.position;
 
         //
         lineRenderer.material.color = Color.green;
@@ -53,6 +56,7 @@ public class AirRacing : MonoBehaviour
     void Update()
     {
         DrawLineInd();
+        UpdateTarget();
     }
 
     // ********** Helper Functions **********
@@ -103,8 +107,9 @@ public class AirRacing : MonoBehaviour
     /// </summary>
     void UpdateTarget() {
         // current Pos
-        Vector3 currPos = camera.transform.position;
+        Vector3 currPos = plane.transform.position;
         
+        // TODO: Check collider intersection instead?
         if (Vector3.Distance(currPos, nextSph.transform.position) <= sphR)
         {
             // update reference
