@@ -200,6 +200,8 @@ public class AirRacing : MonoBehaviour
         // set the color and transparency: half-transparent red
         spherePrefab.GetComponent<Renderer>().material.color = unfinishedColor;
         spherePrefab.GetComponent<Renderer>().material.shader = Shader.Find("Transparent/Diffuse");;
+        spherePrefab.tag = "Sphere";
+        spherePrefab.GetComponent<SphereCollider>().isTrigger = false;
         spherePrefab.GetComponent<SphereCollider>().enabled = false;
 
         // set the radius to 30.0 feet in meter

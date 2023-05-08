@@ -17,7 +17,7 @@ public class CamController : MonoBehaviour
 
     private ViewMode viewMode = ViewMode.ThirdPerson;
     private Vector3 target;
-    private Vector3 targetForward;
+    private Vector3 targetForward = new Vector3(0.0f, 0.0f, 1.0f);
 
 
     // Start is called before the first frame update
