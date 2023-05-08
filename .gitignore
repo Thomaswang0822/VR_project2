@@ -26,8 +26,8 @@
 /[Aa]ssets/Plugins/Editor/JetBrains*
 
 # Oculus integration
-# /[Aa]ssets/Oculus/
-# /[Aa]ssets/WorldMaterialsFree/
+/[Aa]ssets/Oculus/
+/[Aa]ssets/WorldMaterialsFree/
 # Visual Studio cache directory
 .vs/
 
