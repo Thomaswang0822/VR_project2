@@ -35,8 +35,8 @@ public class AirRacing : MonoBehaviour
     void Start()
     {
         // init checking points and Instantiate Spheres indicating check points
-        checkPts = parse_file(); 
-        draw_checkPt();
+        checkPts = ParseFile(); 
+        DrawCheckpoint();
         prevSph = checkPt_Objs[0];
         nextSph = checkPt_Objs[1];
         nextIdx = 1;
@@ -45,18 +45,16 @@ public class AirRacing : MonoBehaviour
 
         //
         lineRenderer.material.color = Color.green;
-
-        
     }
 
     // Update is called once per frame
     void Update()
     {
-        draw_line_ind();
+        DrawLineInd();
     }
 
     // ********** Helper Functions **********
-    List<Vector3> parse_file(string filePath=checkPt_fPath)
+    List<Vector3> ParseFile(string filePath = checkPt_fPath)
     {
         List<Vector3> positions = new List<Vector3>();
         using (StreamReader reader = new StreamReader(filePath))
@@ -77,7 +75,7 @@ public class AirRacing : MonoBehaviour
     }
 
 
-    void draw_checkPt() {
+    void DrawCheckpoint() {
         GameObject spherePrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // set the color and transparency: half-transparent red
         spherePrefab.GetComponent<Renderer>().material.color = unfinishedColor;
@@ -101,7 +99,7 @@ public class AirRacing : MonoBehaviour
     /// 1. detect if user position is within the radius of nextSph
     /// 2. if yes: update prevSph and nextSph; update color
     /// </summary>
-    void update_target() {
+    void UpdateTarget() {
         // current Pos
         Vector3 currPos = camera.transform.position;
         
@@ -124,7 +122,7 @@ public class AirRacing : MonoBehaviour
     /// ? AND/OR
     /// 2. prev and target
     /// </summary>
-    void draw_line_ind() {
+    void DrawLineInd() {
         /* Vector3 startPos = prevSph.transform.position;
         Vector3 endPos = nextSph.transform.position;
         Vector3 direction = (endPos - startPos).normalized;
