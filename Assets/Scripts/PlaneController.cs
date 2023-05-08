@@ -34,15 +34,16 @@ public class PlaneController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // // If the other doesn't have the "Sphere" tag...
-        // if (!other.gameObject.CompareTag("Sphere")) {
-        //     // Signal a collision to the air racing controller
-        //     ar.OnCollision();
-        // }
-        ar.OnCollision();
-
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+        // If the other has a "Sphere" tag...
+        if (other.gameObject.CompareTag("Sphere")) {
+            ar.OnTargetUpdate(other);
+        } else {
+            // Otherwise, signal a collision to the air racing controller
+            ar.OnCollision();
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.Sleep();
+        }
     }
 
     void HandleDebugInput() {

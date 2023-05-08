@@ -88,7 +88,7 @@ public class AirRacing : MonoBehaviour
         UpdateGUI();
 
         DrawLineInd();
-        UpdateTarget();
+        // UpdateTarget();
         DrawMiniMap();
     }
 
@@ -201,8 +201,8 @@ public class AirRacing : MonoBehaviour
         spherePrefab.GetComponent<Renderer>().material.color = unfinishedColor;
         spherePrefab.GetComponent<Renderer>().material.shader = Shader.Find("Transparent/Diffuse");;
         spherePrefab.tag = "Sphere";
-        spherePrefab.GetComponent<SphereCollider>().isTrigger = false;
-        spherePrefab.GetComponent<SphereCollider>().enabled = false;
+        spherePrefab.GetComponent<SphereCollider>().isTrigger = true;
+        spherePrefab.GetComponent<SphereCollider>().enabled = true;
 
         // set the radius to 30.0 feet in meter
         sphR = sphR_foot * foot2meter;
@@ -220,16 +220,14 @@ public class AirRacing : MonoBehaviour
         Destroy(spherePrefab); // destroy the sphere prefab since it's no longer needed
     }
 
-    /// <summary>
-    /// 1. detect if user position is within the radius of nextSph
-    /// 2. if yes: update prevSph and nextSph; update color
-    /// </summary>
-    void UpdateTarget() {
+    // The plane controller tells us when we should try to update.
+    // We pass in the collider to double check that we're intersecting with the right game object.
+    public void OnTargetUpdate(Collider collider) {
         // current Pos
         Vector3 currPos = plane.transform.position;
         
-        // TODO: Check collider intersection instead?
-        if (Vector3.Distance(currPos, nextSph.transform.position) <= sphR)
+        // Sanity check! Make sure this is the right object
+        if (collider.gameObject == nextSph)
         // if (plane.GetComponent<Collider>().bounds.Intersects(nextSph.GetComponent<Collider>().bounds))
         {
             if (nextIdx == checkPts.Count - 1) {
