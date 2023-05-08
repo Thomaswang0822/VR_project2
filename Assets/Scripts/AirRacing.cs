@@ -6,6 +6,8 @@ using UnityEngine;
 public class AirRacing : MonoBehaviour
 {
     // Public:
+    public Camera vrCam;
+
     public GameObject plane;
     public GameObject campus;
     public List<Vector3> checkPts;
@@ -17,6 +19,8 @@ public class AirRacing : MonoBehaviour
     public Color targetColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // solid blue
     public Color finishedColor = new Color(0.0f, 1.0f, 0.0f, 0.1f);  // green
 
+    public GameObject miniMap;
+
     // Private:
     private PlaneController planeController;
     private float sphR_foot = 100.0f;
@@ -24,8 +28,8 @@ public class AirRacing : MonoBehaviour
     // previous and next checkPt sphere indicators: draw line and respawn
     private GameObject prevSph;
     private GameObject nextSph;
-    private int nextIdx;
-
+    private int nextIdx;  // so to increment it and update nextSph
+    private float r_miniMap;  // radius of minimap
     // Consts:
     private const float inch2meter = 0.0254f;  // inch to meter
     private const float foot2meter = 0.3048f;
@@ -33,6 +37,7 @@ public class AirRacing : MonoBehaviour
     // private const float segLen = 0.5f;  // length of a segment in a dotted line
     // private const float segSpacing = 0.3f;  // spacing between segments
     private const int nSeg = 2;  // number of segments per dotted line
+    private const float dist_miniMap = 5.0f;  // distance from camera (in camera coord Z axis)
 
     
     // Start is called before the first frame update
@@ -45,11 +50,15 @@ public class AirRacing : MonoBehaviour
         nextSph = checkPtObjs[1];
         nextIdx = 1;
 
+        // move plane to first checkpoint
         planeController = plane.GetComponent<PlaneController>();
         plane.transform.position = prevSph.transform.position;
 
-        //
         lineRenderer.material.color = Color.green;
+
+        r_miniMap = miniMap.transform.localScale.x;
+
+        
     }
 
     // Update is called once per frame
@@ -57,6 +66,7 @@ public class AirRacing : MonoBehaviour
     {
         DrawLineInd();
         UpdateTarget();
+        DrawMiniMap();
     }
 
     // ********** Helper Functions **********
@@ -85,6 +95,7 @@ public class AirRacing : MonoBehaviour
         GameObject spherePrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // set the color and transparency: half-transparent red
         spherePrefab.GetComponent<Renderer>().material.color = unfinishedColor;
+        spherePrefab.GetComponent<Renderer>().material.shader = Shader.Find("Transparent/Diffuse");;
         // set the radius to 30.0 feet in meter
         sphR = sphR_foot * foot2meter;
         spherePrefab.transform.localScale = Vector3.one * sphR; 
@@ -130,30 +141,16 @@ public class AirRacing : MonoBehaviour
     /// 2. prev and target
     /// </summary>
     void DrawLineInd() {
-        /* Vector3 startPos = prevSph.transform.position;
-        Vector3 endPos = nextSph.transform.position;
-        Vector3 direction = (endPos - startPos).normalized;
-        float distance = (endPos - startPos).magnitude; 
-
-        // length of a segment plus spacing between segments
-        float unitLen = distance / nSeg;
-        float segLen = 0.6f * unitLen;
-
-        // Set the number of segments in the line renderer
-        // add an extra segment (thus 2 pos) to make sure 
-        // the line reaches the end
-        lineRenderer.positionCount = nSeg * 2 + 2;
-
-        // Set the positions of the vertices to create the dotted line
-        for (int i = 0; i <= nSeg; i++)
-        {
-            Vector3 segStartPos = startPos + (direction * i * unitLen);
-            Vector3 segEndPos = segStartPos + (direction * segLen);
-            lineRenderer.SetPosition(i * 2, segStartPos);
-            lineRenderer.SetPosition(i * 2 + 1, segEndPos);
-        } */
-
         lineRenderer.SetPosition(0, prevSph.transform.position);
         lineRenderer.SetPosition(1, nextSph.transform.position);
+    }
+
+
+    void DrawMiniMap() {
+        // bottom mid point in world coordinate
+        Vector3 worldBL = vrCam.ScreenToWorldPoint(new Vector3(0.5f * vrCam.pixelWidth, 0f, dist_miniMap));
+
+        // move up a little bit
+        miniMap.transform.position = worldBL + new Vector3(0f, 0.5f * r_miniMap, 0f);
     }
 }
