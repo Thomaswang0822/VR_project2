@@ -34,6 +34,8 @@ public class AirRacing : MonoBehaviour
 
     public TextMeshProUGUI hud;
     public GameObject miniMap;
+    public GameObject nextLegend;  // a box in mini-map
+    public GameObject nextNextLegend;  // a sphere in mini-map
 
     // Private:
     private GameState state = GameState.Waiting;
@@ -76,9 +78,7 @@ public class AirRacing : MonoBehaviour
 
         lineRenderer.material.color = Color.green;
 
-        r_miniMap = miniMap.transform.localScale.x;
-
-        
+        r_miniMap = miniMap.transform.lossyScale.x * 0.5f;
     }
 
     // Update is called once per frame
@@ -259,10 +259,30 @@ public class AirRacing : MonoBehaviour
     }
 
     void DrawMiniMap() {
+        // Step 1: draw the mini-map frame
         // bottom mid point in world coordinate
-        Vector3 worldBL = vrCam.ScreenToWorldPoint(new Vector3(0.5f * vrCam.pixelWidth, 0f, dist_miniMap));
-
+        Vector3 worldBM = vrCam.ScreenToWorldPoint(new Vector3(0.5f * vrCam.pixelWidth, 0f, dist_miniMap));
         // move up a little bit
-        miniMap.transform.position = worldBL + new Vector3(0f, 0.5f * r_miniMap, 0f);
+        miniMap.transform.position = worldBM + new Vector3(0f, r_miniMap, 0f);
+
+        // Step 2: draw legends
+        // center arrow lies under mini_map and thus requires no handle
+        Vector3 center = miniMap.transform.position;
+
+        if (nextIdx == checkPts.Count + 1) {
+            // next target is destination, only draw next Legend at the radius
+            nextLegend.transform.position = center + r_miniMap * (checkPts[nextIdx] - center).normalized;
+            // safe destroy
+            if (nextNextLegend != null) {
+                Destroy(nextNextLegend);
+            }
+        }
+        else {
+            // pin nextNextLegend on the surface of the minimap
+            // nextLegend adjust position (likely in the minimap sphere) accordingly
+            float dist = (checkPts[nextIdx+1] - center).magnitude;
+            nextNextLegend.transform.position = center + r_miniMap * (checkPts[nextIdx+1] - center).normalized;
+            nextLegend.transform.position = center + r_miniMap * (checkPts[nextIdx] - center).normalized;
+        }
     }
 }
