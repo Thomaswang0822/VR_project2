@@ -10,7 +10,7 @@ public class AirRacing : MonoBehaviour
     public GameObject campus;
     public List<Vector3> checkPts;
     // should have been private, but we make it public to better switch viewpoint in pause mode
-    public List<GameObject> checkPt_Objs;
+    public List<GameObject> checkPtObjs;
     public LineRenderer lineRenderer;
     public GameObject miniMap;
     // Private:
@@ -38,10 +38,10 @@ public class AirRacing : MonoBehaviour
     void Start()
     {
         // init checking points and Instantiate Spheres indicating check points
-        checkPts = parse_file(); 
-        draw_checkPt();
-        prevSph = checkPt_Objs[0];
-        nextSph = checkPt_Objs[1];
+        checkPts = ParseFile(); 
+        DrawCheckpoint();
+        prevSph = checkPtObjs[0];
+        nextSph = checkPtObjs[1];
         nextIdx = 1;
         // move camera to first checkingPt
         camera.transform.position = prevSph.transform.position;
@@ -56,12 +56,12 @@ public class AirRacing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        draw_line_ind();
-        draw_miniMap();
+        DrawLineInd();
+        DrawMiniMap();
     }
 
     // ********** Helper Functions **********
-    List<Vector3> parse_file(string filePath=checkPt_fPath)
+    List<Vector3> ParseFile(string filePath = checkPt_fPath)
     {
         List<Vector3> positions = new List<Vector3>();
         using (StreamReader reader = new StreamReader(filePath))
@@ -82,7 +82,7 @@ public class AirRacing : MonoBehaviour
     }
 
 
-    void draw_checkPt() {
+    void DrawCheckpoint() {
         GameObject spherePrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // set the color and transparency: half-transparent red
         spherePrefab.GetComponent<Renderer>().material.color = unfinishedColor;
@@ -93,11 +93,11 @@ public class AirRacing : MonoBehaviour
         foreach (Vector3 pos in checkPts)
         {
             GameObject sphere = Instantiate(spherePrefab, pos, Quaternion.identity);
-            checkPt_Objs.Add(sphere);
+            checkPtObjs.Add(sphere);
         }
 
-        checkPt_Objs[0].GetComponent<Renderer>().material.color = finishedColor;
-        checkPt_Objs[1].GetComponent<Renderer>().material.color = targetColor;
+        checkPtObjs[0].GetComponent<Renderer>().material.color = finishedColor;
+        checkPtObjs[1].GetComponent<Renderer>().material.color = targetColor;
 
         Destroy(spherePrefab); // destroy the sphere prefab since it's no longer needed
     }
@@ -106,7 +106,7 @@ public class AirRacing : MonoBehaviour
     /// 1. detect if user position is within the radius of nextSph
     /// 2. if yes: update prevSph and nextSph; update color
     /// </summary>
-    void update_target() {
+    void UpdateTarget() {
         // current Pos
         Vector3 currPos = camera.transform.position;
         
@@ -115,7 +115,7 @@ public class AirRacing : MonoBehaviour
             // update reference
             nextIdx++;
             prevSph = nextSph;
-            nextSph = checkPt_Objs[nextIdx];
+            nextSph = checkPtObjs[nextIdx];
 
             // update color
             prevSph.GetComponent<Renderer>().material.color = finishedColor;
@@ -129,13 +129,13 @@ public class AirRacing : MonoBehaviour
     /// ? AND/OR
     /// 2. prev and target
     /// </summary>
-    void draw_line_ind() {
+    void DrawLineInd() {
         lineRenderer.SetPosition(0, prevSph.transform.position);
         lineRenderer.SetPosition(1, nextSph.transform.position);
     }
 
 
-    void draw_miniMap() {
+    void DrawMiniMap() {
         // bottom mid point in world coordinate
         Vector3 worldBL = camera.ScreenToWorldPoint(new Vector3(0.5f * camera.pixelWidth, 0f, dist_miniMap));
         // move up a little bit
