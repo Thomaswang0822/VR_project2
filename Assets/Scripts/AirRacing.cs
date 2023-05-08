@@ -10,8 +10,9 @@ public class AirRacing : MonoBehaviour
     public GameObject campus;
     public List<Vector3> checkPts;
     // should have been private, but we make it public to better switch viewpoint in pause mode
-    public List<GameObject> checkPt_Objs;
+    public List<GameObject> checkPtObjs;
     public LineRenderer lineRenderer;
+
     // Private:
     private float sphR_foot = 30.0f;
     private float sphR;
@@ -19,6 +20,7 @@ public class AirRacing : MonoBehaviour
     private GameObject prevSph;
     private GameObject nextSph;
     private int nextIdx;
+
     // Consts:
     private const float inch2meter = 0.0254f;  // inch to meter
     private const float foot2meter = 0.3048f;
@@ -37,8 +39,8 @@ public class AirRacing : MonoBehaviour
         // init checking points and Instantiate Spheres indicating check points
         checkPts = ParseFile(); 
         DrawCheckpoint();
-        prevSph = checkPt_Objs[0];
-        nextSph = checkPt_Objs[1];
+        prevSph = checkPtObjs[0];
+        nextSph = checkPtObjs[1];
         nextIdx = 1;
 
         camera.transform.position = prevSph.transform.position;
@@ -86,11 +88,11 @@ public class AirRacing : MonoBehaviour
         foreach (Vector3 pos in checkPts)
         {
             GameObject sphere = Instantiate(spherePrefab, pos, Quaternion.identity);
-            checkPt_Objs.Add(sphere);
+            checkPtObjs.Add(sphere);
         }
 
-        checkPt_Objs[0].GetComponent<Renderer>().material.color = finishedColor;
-        checkPt_Objs[1].GetComponent<Renderer>().material.color = targetColor;
+        checkPtObjs[0].GetComponent<Renderer>().material.color = finishedColor;
+        checkPtObjs[1].GetComponent<Renderer>().material.color = targetColor;
 
         Destroy(spherePrefab); // destroy the sphere prefab since it's no longer needed
     }
@@ -108,7 +110,7 @@ public class AirRacing : MonoBehaviour
             // update reference
             nextIdx++;
             prevSph = nextSph;
-            nextSph = checkPt_Objs[nextIdx];
+            nextSph = checkPtObjs[nextIdx];
 
             // update color
             prevSph.GetComponent<Renderer>().material.color = finishedColor;
