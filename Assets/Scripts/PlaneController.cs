@@ -18,6 +18,7 @@ public class PlaneController : MonoBehaviour
     private float yaw;       // turn left to right
 
     private float maxThrust = 200.0f;
+    private bool debugMode = true;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +30,10 @@ public class PlaneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        HandleDebugInput();
+        if (debugMode) {
+            HandleDebugInput();
+        }
+        
     }
 
     void OnTriggerEnter(Collider other)
@@ -76,6 +80,31 @@ public class PlaneController : MonoBehaviour
             yaw = 1.0f;
         }
     }
+
+    /// <summary>
+    /// Design Note: 
+    /// In theory, aircraft has 3 rotational components, pitch, yaw, roll.
+    /// But in reality, pitch solely controls "up and down"; 
+    /// yaw + roll control "turning left and right" together. 
+    /// 
+    /// Thus, we handle 3 types of interations:
+    /// 1. acceleration & deceleration
+    /// 2. up & down
+    /// 3. turn left & right
+    /// </summary>
+    void HandleInput() {
+        throttle = 0.0f;
+        roll = 0.0f;
+        pitch = 0.0f;
+        yaw = 0.0f;
+
+        // 1. acceleration & deceleration
+
+        // 2. up & down
+
+        // 3. turn left & right
+    }
+
 
     void FixedUpdate()
     {

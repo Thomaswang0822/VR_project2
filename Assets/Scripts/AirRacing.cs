@@ -279,7 +279,7 @@ public class AirRacing : MonoBehaviour
         }
         else {
             // pin nextNextLegend on the surface of the minimap
-            // nextLegend adjust position (likely in the minimap sphere) accordingly
+            // nextLegend adjust position (likely inside the minimap sphere) accordingly
             float dist = (checkPts[nextIdx+1] - center).magnitude;
             nextNextLegend.transform.position = center + r_miniMap * (checkPts[nextIdx+1] - center).normalized;
             nextLegend.transform.position = center + r_miniMap * (checkPts[nextIdx] - center) / dist;
