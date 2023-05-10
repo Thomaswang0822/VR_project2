@@ -7,10 +7,12 @@ public class PlaneController : MonoBehaviour
 
     // Public
     public GameObject airRacingContainer;
+    public GameObject gestureDetectionContainer;
 
     // Private
     private AirRacing ar;
     private Rigidbody rb;
+    private GestureDetector gestureDetector;
 
     private float throttle;  // % of max engine thrust
     private float roll;      // tilt left to right
@@ -25,6 +27,7 @@ public class PlaneController : MonoBehaviour
     {
         ar = airRacingContainer.GetComponent<AirRacing>();
         rb = GetComponent<Rigidbody>();
+        gestureDetector = gestureDetectionContainer.GetComponent<GestureDetector>();
     }
 
     // Update is called once per frame
@@ -91,6 +94,14 @@ public class PlaneController : MonoBehaviour
     /// 1. acceleration & deceleration
     /// 2. up & down
     /// 3. turn left & right
+    /// 
+    /// Design decision:
+    /// 1. Right hand is used as throttle: thumb_up and fist are 
+    ///     acc and dec
+    /// 2. Left hand is used as orientation controller. The base state
+    ///     is the vertical hand （palm inward).
+    ///     - barrel roll is turning L/R
+    ///     - finger tip up/down is pitching up/down
     /// </summary>
     void HandleInput() {
         throttle = 0.0f;
@@ -98,11 +109,41 @@ public class PlaneController : MonoBehaviour
         pitch = 0.0f;
         yaw = 0.0f;
 
-        // 1. acceleration & deceleration
+        Gesture currGesture = gestureDetector.Recognize();
+        bool detected = !currGesture.Equals(new Gesture());
+        if (!detected || 
+            currGesture.name == "null_L" ||
+            currGesture.name == "null_R") { return; }
 
-        // 2. up & down
-
-        // 3. turn left & right
+        switch (currGesture.name)
+        {
+            // 1. acceleration & deceleration
+            case "thumb_R":
+                throttle = 1.0f;
+                break;
+            case "fist_R":
+                throttle = -0.5f;
+                break;
+            // 2. up & down
+            case "tipUp_L":
+                pitch = 1.0f;
+                break;
+            case "tipDown_L":
+                pitch = -1.0f;
+                break;
+            // 3. turn left & right
+            case "palmUp_L":
+                yaw = -1.0f;
+                roll = -1.0f;
+                break;
+            case "palmDown_L":
+                yaw = 1.0f;
+                roll = 1.0f;
+                break;
+            default:
+                Debug.Log("Gesture added but not handled properly: " + currGesture.name);
+                break;
+        }  
     }
 
 

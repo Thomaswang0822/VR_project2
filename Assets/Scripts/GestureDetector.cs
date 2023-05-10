@@ -18,6 +18,7 @@ public class GestureDetector : MonoBehaviour
     public OVRSkeleton skeleton;
     public List<Gesture> gestures;
     private List<OVRBone> fingerBones;
+    public float threshold = 0.05f;  // hand gesture detection sensitivity
 
     // Private:
     private bool debugMode = true;
@@ -51,6 +52,50 @@ public class GestureDetector : MonoBehaviour
         }
         g.fingerData = data;
         gestures.Add(g);
+    }
+
+
+    /// <summary>
+    /// Recognize user gesture in the current frame.
+    /// </summary>
+    /// <returns>
+    /// A pre-defined gesture that matches the best in the List.
+    /// If no close match, return a new Gesture();
+    /// </returns>
+    public Gesture Recognize() {
+        Gesture currG = new Gesture();
+        float currMin = Mathf.Infinity;
+
+        foreach (var gesture in gestures) {
+            // how likely the user gesture matches the current gesture in the List
+            // depends on the total bone distance
+            float sumDist = 0;
+            bool isDiscared = false;
+            // compare distance on each bone
+            for (int i=0; i<fingerBones.Count; i++) {
+                Vector3 currData = skeleton.transform.InverseTransformPoint(
+                    fingerBones[i].Transform.position
+                );
+                float dist = Vector3.Distance(currData, gesture.fingerData[i]);
+                // a particular bone is too far away
+                if (dist > threshold)
+                {
+                    // break inner loop: stop comparing bones
+                    isDiscared = true;
+                    break;
+                }
+
+                sumDist += dist;
+            }
+
+            // a valid and better-matched gesture
+            if (!isDiscared && sumDist < currMin) {
+                currMin = sumDist;
+                currG = gesture;
+            }
+        }
+
+        return currG;
     }
 
 
