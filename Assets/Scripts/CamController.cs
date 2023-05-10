@@ -17,7 +17,7 @@ public class CamController : MonoBehaviour
 
     private ViewMode viewMode = ViewMode.ThirdPerson;
     private Vector3 target;
-    private Vector3 targetForward = new Vector3(0.0f, 0.0f, 1.0f);
+    private Quaternion targetRotation = Quaternion.identity;
 
 
     // Start is called before the first frame update
@@ -54,12 +54,12 @@ public class CamController : MonoBehaviour
             case ViewMode.FirstPerson:
             case ViewMode.Cockpit:
                 target = cockpitView.position;
-                targetForward = cockpitView.forward;
+                targetRotation = cockpitView.rotation;
                 break;
 
             case ViewMode.ThirdPerson:
                 target = behindView.position;
-                targetForward = behindView.forward;
+                targetRotation = behindView.rotation;
                 break;
         }
     }
@@ -72,6 +72,6 @@ public class CamController : MonoBehaviour
 
     void FixedUpdate() {
         transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * speed);
-        transform.forward = targetForward;
+        transform.rotation = targetRotation;
     }
 }
