@@ -34,6 +34,7 @@ public class GestureDetector : MonoBehaviour
         if (debugMode && Input.GetKeyDown(KeyCode.Space))
         {
             SaveGesture();
+            Debug.Log("Saved a new Gesture: " + gestures[gestures.Count-1].name);
         }
     }
 

@@ -53,13 +53,13 @@ public class CamController : MonoBehaviour
         switch (viewMode) {
             case ViewMode.FirstPerson:
             case ViewMode.Cockpit:
-                target = cockpitView.position;
-                targetRotation = cockpitView.rotation;
+                transform.position = Vector3.MoveTowards(transform.position, cockpitView.position, Time.deltaTime * speed);
+                transform.rotation = cockpitView.rotation;
                 break;
 
             case ViewMode.ThirdPerson:
-                target = behindView.position;
-                targetRotation = behindView.rotation;
+                transform.position = Vector3.MoveTowards(transform.position, behindView.position, Time.deltaTime * speed);
+                transform.rotation = behindView.rotation;
                 break;
         }
     }
@@ -71,7 +71,6 @@ public class CamController : MonoBehaviour
     }
 
     void FixedUpdate() {
-        transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * speed);
-        transform.rotation = targetRotation;
+
     }
 }
