@@ -263,13 +263,13 @@ public class AirRacing : MonoBehaviour
         // bottom mid point in world coordinate
         Vector3 worldBM = vrCam.ScreenToWorldPoint(new Vector3(0.5f * vrCam.pixelWidth, 0f, dist_miniMap));
         // move up a little bit
-        miniMap.transform.position = worldBM + new Vector3(0f, r_miniMap, 0f);
+        miniMap.transform.position = worldBM + new Vector3(0f, 2f * r_miniMap, 0f);
 
         // Step 2: draw legends
         // center arrow lies under mini_map and thus requires no handle
         Vector3 center = miniMap.transform.position;
 
-        if (nextIdx == checkPts.Count + 1) {
+        if (nextIdx == checkPts.Count - 1) {
             // next target is destination, only draw next Legend at the radius
             nextLegend.transform.position = center + r_miniMap * (checkPts[nextIdx] - center).normalized;
             // safe destroy

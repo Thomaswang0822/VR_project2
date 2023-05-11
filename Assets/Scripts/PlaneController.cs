@@ -7,12 +7,14 @@ public class PlaneController : MonoBehaviour
 
     // Public
     public GameObject airRacingContainer;
-    public GameObject gestureDetectionContainer;
+    public GameObject leftGDContainer;
+    public GameObject rightGDContainer;
 
     // Private
     private AirRacing ar;
     private Rigidbody rb;
-    private GestureDetector gestureDetector;
+    private GestureDetector leftGD;
+    private GestureDetector rightGD;
 
     private float throttle;  // % of max engine thrust
     private float roll;      // tilt left to right
@@ -20,14 +22,15 @@ public class PlaneController : MonoBehaviour
     private float yaw;       // turn left to right
 
     private float maxThrust = 200.0f;
-    private bool debugMode = true;
+    private bool debugMode = false;
 
     // Start is called before the first frame update
     void Start()
     {
         ar = airRacingContainer.GetComponent<AirRacing>();
         rb = GetComponent<Rigidbody>();
-        gestureDetector = gestureDetectionContainer.GetComponent<GestureDetector>();
+        leftGD = leftGDContainer.GetComponent<GestureDetector>();
+        rightGD = rightGDContainer.GetComponent<GestureDetector>();
     }
 
     // Update is called once per frame
@@ -37,6 +40,7 @@ public class PlaneController : MonoBehaviour
             HandleDebugInput();
         }
         
+        HandleInput();
     }
 
     void OnTriggerEnter(Collider other)
@@ -109,13 +113,37 @@ public class PlaneController : MonoBehaviour
         pitch = 0.0f;
         yaw = 0.0f;
 
-        Gesture currGesture = gestureDetector.Recognize();
-        bool detected = !currGesture.Equals(new Gesture());
-        if (!detected || 
-            currGesture.name == "null_L" ||
-            currGesture.name == "null_R") { return; }
+        Gesture leftGesture = leftGD.Recognize();
+        Gesture rightGesture = rightGD.Recognize();
+        bool detected = !leftGesture.Equals(new Gesture()) || !rightGesture.Equals(new Gesture());
+        if (!detected) { return; }
 
-        switch (currGesture.name)
+        if (!ar.AcceptInput()) return;
+
+        switch (leftGesture.name)
+        {
+            // 2. up & down
+            case "tipUp_L":
+                pitch = 0.1f;
+                break;
+            case "tipDown_L":
+                pitch = -0.1f;
+                break;
+            // 3. turn left & right
+            case "palmUp_L":
+                yaw = -0.1f;
+                roll = -0.1f;
+                break;
+            case "palmDown_L":
+                yaw = 0.1f;
+                roll = 0.1f;
+                break;
+            default:
+                Debug.Log("Gesture added but not handled properly: " + leftGesture.name);
+                break;
+        }
+
+        switch (rightGesture.name)
         {
             // 1. acceleration & deceleration
             case "thumb_R":
@@ -124,26 +152,12 @@ public class PlaneController : MonoBehaviour
             case "fist_R":
                 throttle = -0.5f;
                 break;
-            // 2. up & down
-            case "tipUp_L":
-                pitch = 1.0f;
-                break;
-            case "tipDown_L":
-                pitch = -1.0f;
-                break;
-            // 3. turn left & right
-            case "palmUp_L":
-                yaw = -1.0f;
-                roll = -1.0f;
-                break;
-            case "palmDown_L":
-                yaw = 1.0f;
-                roll = 1.0f;
-                break;
             default:
-                Debug.Log("Gesture added but not handled properly: " + currGesture.name);
+                Debug.Log("Gesture added but not handled properly: " + rightGesture.name);
                 break;
-        }  
+        }
+
+        // Debug.Log("pitch " + pitch);    
     }
 
 

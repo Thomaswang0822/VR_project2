@@ -23,7 +23,7 @@ public class CamController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        transform.forward = behindView.forward;
     }
 
     void CycleView()

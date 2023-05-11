@@ -21,18 +21,24 @@ public class GestureDetector : MonoBehaviour
     public float threshold = 0.05f;  // hand gesture detection sensitivity
 
     // Private:
-    private bool debugMode = true;
+    public bool debugMode = true;
     // Start is called before the first frame update
-    void Start()
-    {    
+    IEnumerator Start()
+    {
+        while (skeleton.Bones.Count == 0) {
+            yield return null;
+        }
+
         fingerBones = new List<OVRBone>(skeleton.Bones);
+        Debug.Log("Check size of fingerBones data: " + fingerBones.Count);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (debugMode && Input.GetKeyDown(KeyCode.Space))
+        if (debugMode && Input.GetKeyDown("r"))
         {
+            Debug.Log("trying to save");
             SaveGesture();
             Debug.Log("Saved a new Gesture: " + gestures[gestures.Count-1].name);
         }
@@ -88,6 +94,8 @@ public class GestureDetector : MonoBehaviour
 
                 sumDist += dist;
             }
+
+            // Debug.Log("Gesture " + gesture.name + ": " + sumDist);
 
             // a valid and better-matched gesture
             if (!isDiscared && sumDist < currMin) {
