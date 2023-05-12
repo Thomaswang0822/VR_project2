@@ -15,6 +15,6 @@ All the resources used for this project are located in `Assets/Scripts/docs.md`.
 
 ## Relevant links
 
-- Github link: https://github.com/Thomaswang0822/VR_project2/commit/f8ee98d341dab38b40e88efc9b65703d9194fcd8 
+- Github link: https://github.com/Thomaswang0822/VR_project2
 - Demo video: `demo.mp4`
 - Project Design Document: `design.pdf`
