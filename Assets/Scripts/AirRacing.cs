@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;  // to parse
+using System.Linq;
 using UnityEngine;
 using TMPro;
 
@@ -67,7 +68,8 @@ public class AirRacing : MonoBehaviour
     void Start()
     {
         // init checking points and Instantiate Spheres indicating check points
-        checkPts = ParseFile(); 
+        // checkPts = ParseFile(); 
+        checkPts = ParseStr(); 
         DrawCheckpoint();
         prevSph = checkPtObjs[0];
         nextSph = checkPtObjs[1];
@@ -103,6 +105,35 @@ public class AirRacing : MonoBehaviour
     {
         List<Vector3> positions = new List<Vector3>();
         using (StreamReader reader = new StreamReader(filePath))
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] coords = line.Split(' ');
+                Vector3 pos = new Vector3(
+                    float.Parse(coords[0]),
+                    float.Parse(coords[1]), 
+                    float.Parse(coords[2])
+                );
+                positions.Add(pos * inch2meter);
+            }
+        }
+        return positions;
+    }
+
+    List<Vector3> ParseStr()
+    {
+        string info = @"-84024 360 -85271
+-92678 2000 -85271
+-98122 5000 -96911
+-92678 4000 -85271
+-78619 1674 -85271
+-68341 100 -71901
+-78619 100 -83753
+-94793 1000 -88931";
+
+        List<Vector3> positions = new List<Vector3>();
+        using (StringReader reader = new StringReader(info))
         {
             string line;
             while ((line = reader.ReadLine()) != null)

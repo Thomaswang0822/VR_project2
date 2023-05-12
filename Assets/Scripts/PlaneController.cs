@@ -17,6 +17,7 @@ public class PlaneController : MonoBehaviour
     private GestureDetector leftGD;
     private GestureDetector rightGD;
     private CamController camController;
+    private string prevGesture;
 
     private float throttle;  // % of max engine thrust
     private float roll;      // tilt left to right
@@ -148,6 +149,9 @@ public class PlaneController : MonoBehaviour
                 break;
         }
 
+        string frPrev = prevGesture;
+        prevGesture = rightGesture.name;
+
         switch (rightGesture.name)
         {
             // 1. acceleration & deceleration
@@ -157,12 +161,16 @@ public class PlaneController : MonoBehaviour
             case "fist_R":
                 throttle = -0.5f;
                 break;
-            case "SOME NAME":
-                camController.CycleView();
-                break;
+            // case "SOME NAME":
+            //     camController.CycleView();
+            //     break;
             default:
                 Debug.Log("Gesture added but not handled properly: " + rightGesture.name);
                 break;
+        }
+
+        if (frPrev != prevGesture && prevGesture == "SOME_NAME") {
+            camController.CycleView();
         }
 
         // Debug.Log("pitch " + pitch);    
