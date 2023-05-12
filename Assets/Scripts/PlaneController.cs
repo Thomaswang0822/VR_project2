@@ -10,6 +10,7 @@ public class PlaneController : MonoBehaviour
     public GameObject leftGDContainer;
     public GameObject rightGDContainer;
     public GameObject camRig;
+    public bool debugMode = false;
 
     // Private
     private AirRacing ar;
@@ -17,7 +18,7 @@ public class PlaneController : MonoBehaviour
     private GestureDetector leftGD;
     private GestureDetector rightGD;
     private CamController camController;
-    private string prevGesture;
+    private string prevGesture = "bruh";
 
     private float throttle;  // % of max engine thrust
     private float roll;      // tilt left to right
@@ -25,7 +26,6 @@ public class PlaneController : MonoBehaviour
     private float yaw;       // turn left to right
 
     private float maxThrust = 200.0f;
-    private bool debugMode = false;
 
     // Start is called before the first frame update
     void Start()
@@ -119,12 +119,13 @@ public class PlaneController : MonoBehaviour
         pitch = 0.0f;
         yaw = 0.0f;
 
+        if (!ar.AcceptInput()) return;
+
         Gesture leftGesture = leftGD.Recognize();
         Gesture rightGesture = rightGD.Recognize();
         bool detected = !leftGesture.Equals(new Gesture()) || !rightGesture.Equals(new Gesture());
         if (!detected) { return; }
 
-        if (!ar.AcceptInput()) return;
 
         switch (leftGesture.name)
         {
@@ -149,9 +150,6 @@ public class PlaneController : MonoBehaviour
                 break;
         }
 
-        string frPrev = prevGesture;
-        prevGesture = rightGesture.name;
-
         switch (rightGesture.name)
         {
             // 1. acceleration & deceleration
@@ -159,7 +157,10 @@ public class PlaneController : MonoBehaviour
                 throttle = 1.0f;
                 break;
             case "fist_R":
-                throttle = -0.5f;
+                // throttle = -0.5f;
+                if (prevGesture != "fist_R") {
+                    camController.CycleView();
+                }
                 break;
             // case "SOME NAME":
             //     camController.CycleView();
@@ -169,10 +170,7 @@ public class PlaneController : MonoBehaviour
                 break;
         }
 
-        if (frPrev != prevGesture && prevGesture == "SOME_NAME") {
-            camController.CycleView();
-        }
-
+        prevGesture = System.String.Copy(rightGesture.name);
         // Debug.Log("pitch " + pitch);    
     }
 

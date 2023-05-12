@@ -15,7 +15,7 @@ public class CamController : MonoBehaviour
     public Transform cockpitView;
     public float speed;
 
-    private ViewMode viewMode = ViewMode.ThirdPerson;
+    private ViewMode viewMode = ViewMode.FirstPerson;
     private Vector3 target;
     private Quaternion targetRotation = Quaternion.identity;
 
@@ -24,6 +24,7 @@ public class CamController : MonoBehaviour
     void Start()
     {
         transform.forward = behindView.forward;
+        planeModel.SetActive(false);
     }
 
     public void CycleView()

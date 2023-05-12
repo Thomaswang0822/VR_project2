@@ -73,11 +73,15 @@ public class GestureDetector : MonoBehaviour
         Gesture currG = new Gesture();
         float currMin = Mathf.Infinity;
 
+        if (fingerBones == null) {
+            return currG;
+        }
+
         foreach (var gesture in gestures) {
             // how likely the user gesture matches the current gesture in the List
             // depends on the total bone distance
             float sumDist = 0;
-            bool isDiscared = false;
+            bool toDiscard = false;
             // compare distance on each bone
             for (int i=0; i<fingerBones.Count; i++) {
                 Vector3 currData = skeleton.transform.InverseTransformPoint(
@@ -88,17 +92,14 @@ public class GestureDetector : MonoBehaviour
                 if (dist > threshold)
                 {
                     // break inner loop: stop comparing bones
-                    isDiscared = true;
+                    toDiscard = true;
                     break;
                 }
 
                 sumDist += dist;
             }
 
-            // Debug.Log("Gesture " + gesture.name + ": " + sumDist);
-
-            // a valid and better-matched gesture
-            if (!isDiscared && sumDist < currMin) {
+            if (!toDiscard && sumDist < currMin) {
                 currMin = sumDist;
                 currG = gesture;
             }

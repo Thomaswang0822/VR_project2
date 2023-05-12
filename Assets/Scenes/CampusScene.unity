@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.59937525, g: 0.5997512, b: 0.59948856, a: 1}
+  m_IndirectSpecularColor: {r: 0.5993744, g: 0.5997502, b: 0.5994878, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -646,7 +646,7 @@ SphereCollider:
   m_GameObject: {fileID: 437227112}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -2254,7 +2254,7 @@ BoxCollider:
   m_GameObject: {fileID: 1074404386}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -2367,7 +2367,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1225281491}
   serializedVersion: 2
-  m_Mass: 7.5
+  m_Mass: 5
   m_Drag: 1
   m_AngularDrag: 1
   m_UseGravity: 0
@@ -2390,6 +2390,8 @@ MonoBehaviour:
   airRacingContainer: {fileID: 1575435923}
   leftGDContainer: {fileID: 1341183142}
   rightGDContainer: {fileID: 1360126738}
+  camRig: {fileID: 1258778991}
+  debugMode: 1
 --- !u!4 &1225281495
 Transform:
   m_ObjectHideFlags: 0
@@ -2599,14 +2601,14 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 195279221}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 10
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
-  m_SortingLayerID: 0
+  m_SortingLayerID: 1352803619
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &1231069862
@@ -3197,14 +3199,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vrCam: {fileID: 195279221}
+  track: {fileID: 4900000, guid: f30002cb2ba604cabaee49c8b02c407c, type: 3}
   plane: {fileID: 1225281491}
   campus: {fileID: 914394114}
   checkPts: []
   checkPtObjs: []
   lineRenderer: {fileID: 1575435926}
-  unfinishedColor: {r: 1, g: 0, b: 0, a: 0.5}
-  targetColor: {r: 0, g: 0, b: 1, a: 1}
-  finishedColor: {r: 0, g: 1, b: 0, a: 0.1}
+  unfinishedColor: {fileID: 2100000, guid: 8a37cec49e6bf42359ebfaf4a13d5cf8, type: 2}
+  targetColor: {fileID: 2100000, guid: 1479201f0ce4843cab83f1517cf00912, type: 2}
+  finishedColor: {fileID: 2100000, guid: 9aaee9198c29f4b688c97d29d6b34165, type: 2}
   hud: {fileID: 1301940793}
   miniMap: {fileID: 2069113456}
   nextLegend: {fileID: 1074404386}
@@ -3508,7 +3511,7 @@ SphereCollider:
   m_GameObject: {fileID: 2069113456}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}

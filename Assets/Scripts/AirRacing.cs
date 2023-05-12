@@ -22,6 +22,7 @@ public class AirRacing : MonoBehaviour
     // Public:
     public Camera vrCam;
 
+    public TextAsset track;
     public GameObject plane;
     public GameObject campus;
     public List<Vector3> checkPts;
@@ -29,9 +30,9 @@ public class AirRacing : MonoBehaviour
     public List<GameObject> checkPtObjs;
     public LineRenderer lineRenderer;
 
-    public Color unfinishedColor = new Color(1.0f, 0.0f, 0.0f, 0.5f);  // half-transparent red
-    public Color targetColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // solid blue
-    public Color finishedColor = new Color(0.0f, 1.0f, 0.0f, 0.1f);  // green
+    public Material unfinishedColor;
+    public Material targetColor;
+    public Material finishedColor;
 
     public TextMeshProUGUI hud;
     public GameObject miniMap;
@@ -42,7 +43,7 @@ public class AirRacing : MonoBehaviour
     private GameState state = GameState.Waiting;
     private PlaneController planeController;
     private AudioController audioController;
-    private float sphR_foot = 100.0f;
+    private float sphR_foot = 30.0f;
     private float sphR;
     // previous and next checkPt sphere indicators: draw line and respawn
     private GameObject prevSph;
@@ -52,7 +53,7 @@ public class AirRacing : MonoBehaviour
 
     // Timer stuff
     private float elapsed = 0f;
-    private float countdown = 3.0f;
+    private float countdown = 10.0f;
 
     // Consts:
     private const float inch2meter = 0.0254f;  // inch to meter
@@ -123,14 +124,15 @@ public class AirRacing : MonoBehaviour
 
     List<Vector3> ParseStr()
     {
-        string info = @"-84024 360 -85271
--92678 2000 -85271
--98122 5000 -96911
--92678 4000 -85271
--78619 1674 -85271
--68341 100 -71901
--78619 100 -83753
--94793 1000 -88931";
+//         string info = @"-84024 360 -85271
+// -92678 2000 -85271
+// -98122 5000 -96911
+// -92678 4000 -85271
+// -78619 1674 -85271
+// -68341 100 -71901
+// -78619 100 -83753
+// -94793 1000 -88931";
+        string info = track.text;
 
         List<Vector3> positions = new List<Vector3>();
         using (StringReader reader = new StringReader(info))
@@ -240,8 +242,7 @@ public class AirRacing : MonoBehaviour
     void DrawCheckpoint() {
         GameObject spherePrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // set the color and transparency: half-transparent red
-        spherePrefab.GetComponent<Renderer>().material.color = unfinishedColor;
-        spherePrefab.GetComponent<Renderer>().material.shader = Shader.Find("Transparent/Diffuse");;
+        spherePrefab.GetComponent<Renderer>().material = unfinishedColor;
         spherePrefab.tag = "Sphere";
         spherePrefab.GetComponent<SphereCollider>().isTrigger = true;
         spherePrefab.GetComponent<SphereCollider>().enabled = true;
@@ -256,8 +257,8 @@ public class AirRacing : MonoBehaviour
             checkPtObjs.Add(sphere);
         }
 
-        checkPtObjs[0].GetComponent<Renderer>().material.color = finishedColor;
-        checkPtObjs[1].GetComponent<Renderer>().material.color = targetColor;
+        checkPtObjs[0].GetComponent<Renderer>().material = finishedColor;
+        checkPtObjs[1].GetComponent<Renderer>().material = targetColor;
 
         Destroy(spherePrefab); // destroy the sphere prefab since it's no longer needed
     }
@@ -284,8 +285,8 @@ public class AirRacing : MonoBehaviour
             nextSph = checkPtObjs[nextIdx];
 
             // update color
-            prevSph.GetComponent<Renderer>().material.color = finishedColor;
-            nextSph.GetComponent<Renderer>().material.color = targetColor;
+            prevSph.GetComponent<Renderer>().material = finishedColor;
+            nextSph.GetComponent<Renderer>().material = targetColor;
 
             // play bingo sound
             audioController.onPass();
