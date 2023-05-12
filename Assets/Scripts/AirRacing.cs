@@ -23,6 +23,7 @@ public class AirRacing : MonoBehaviour
 
     public GameObject plane;
     public GameObject campus;
+    public GameObject AudioContainer;
     public List<Vector3> checkPts;
     // should have been private, but we make it public to better switch viewpoint in pause mode
     public List<GameObject> checkPtObjs;
@@ -40,6 +41,7 @@ public class AirRacing : MonoBehaviour
     // Private:
     private GameState state = GameState.Waiting;
     private PlaneController planeController;
+    private AudioController audioController;
     private float sphR_foot = 100.0f;
     private float sphR;
     // previous and next checkPt sphere indicators: draw line and respawn
@@ -75,6 +77,11 @@ public class AirRacing : MonoBehaviour
         // move plane to first checkpoint
         planeController = plane.GetComponent<PlaneController>();
         OrientPlane();
+
+        // init audio controller
+        audioController = plane.GetComponent<AudioController>();
+        // and play ready sound immediately
+        audioController.onReady();
 
         lineRenderer.material.color = Color.green;
 
@@ -119,6 +126,8 @@ public class AirRacing : MonoBehaviour
 
     public void OnCollision() {
         OrientPlane();
+        // play crashing audio
+        audioController.onCrash();
         state = GameState.Respawning;
     }
 
@@ -148,7 +157,10 @@ public class AirRacing : MonoBehaviour
 
             case GameState.Playing:
                 elapsed += Time.deltaTime;
-
+                // Play default audio only if current clip is not the default
+                if (!audioController.src.clip.Equals(audioController.speed)) {
+                    audioController.onDriving();
+                }
                 break;
 
             case GameState.Respawning:
@@ -244,6 +256,9 @@ public class AirRacing : MonoBehaviour
             // update color
             prevSph.GetComponent<Renderer>().material.color = finishedColor;
             nextSph.GetComponent<Renderer>().material.color = targetColor;
+
+            // play bingo sound
+            audioController.onPass();
         }
     }
 
