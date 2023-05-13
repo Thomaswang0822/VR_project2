@@ -26,7 +26,7 @@ public class CamController : MonoBehaviour
         transform.forward = behindView.forward;
     }
 
-    void CycleView()
+    public void CycleView()
     {
         switch (viewMode) {
             case ViewMode.FirstPerson:

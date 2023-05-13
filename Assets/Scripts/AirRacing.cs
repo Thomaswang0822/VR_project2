@@ -23,7 +23,6 @@ public class AirRacing : MonoBehaviour
 
     public GameObject plane;
     public GameObject campus;
-    public GameObject AudioContainer;
     public List<Vector3> checkPts;
     // should have been private, but we make it public to better switch viewpoint in pause mode
     public List<GameObject> checkPtObjs;

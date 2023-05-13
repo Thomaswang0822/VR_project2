@@ -9,12 +9,14 @@ public class PlaneController : MonoBehaviour
     public GameObject airRacingContainer;
     public GameObject leftGDContainer;
     public GameObject rightGDContainer;
+    public GameObject camRig;
 
     // Private
     private AirRacing ar;
     private Rigidbody rb;
     private GestureDetector leftGD;
     private GestureDetector rightGD;
+    private CamController camController;
 
     private float throttle;  // % of max engine thrust
     private float roll;      // tilt left to right
@@ -31,6 +33,9 @@ public class PlaneController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         leftGD = leftGDContainer.GetComponent<GestureDetector>();
         rightGD = rightGDContainer.GetComponent<GestureDetector>();
+
+        camController = camRig.GetComponent<CamController>();
+
     }
 
     // Update is called once per frame
@@ -151,6 +156,9 @@ public class PlaneController : MonoBehaviour
                 break;
             case "fist_R":
                 throttle = -0.5f;
+                break;
+            case "SOME NAME":
+                camController.CycleView();
                 break;
             default:
                 Debug.Log("Gesture added but not handled properly: " + rightGesture.name);
